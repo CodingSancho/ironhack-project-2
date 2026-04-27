@@ -1,0 +1,24 @@
+---
+- name: Deploy PostgreSQL on Instance C
+  hosts: db
+  become: true
+
+  tasks:
+    - name: Pull PostgreSQL image
+      community.docker.docker_image:
+        name: postgres
+        tag: "15"
+        source: pull
+
+    - name: Run PostgreSQL container
+      community.docker.docker_container:
+        name: postgres
+        image: postgres:15
+        state: started
+        restart_policy: always
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "postgres"
+          POSTGRES_DB: "votes"

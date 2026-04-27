@@ -1,0 +1,49 @@
+---
+- name: Deploy Vote and Result on Instance A
+  hosts: frontend
+  become: true
+
+  vars:
+    redis_host: "10.0.2.188"    # Instance B private IP
+    db_host: "10.0.3.18"        # Instance C private IP
+    db_user: "postgres"
+    db_password: "postgres"
+    db_name: "votes"
+
+  tasks:
+    - name: Pull Vote image
+      community.docker.docker_image:
+        name: vitotolantoto/vote
+        tag: latest
+        source: pull
+
+    - name: Run Vote container
+      community.docker.docker_container:
+        name: vote
+        image: vitotolantoto/vote:latest
+        state: started
+        restart_policy: always
+        ports:
+          - "5000:80"
+        env:
+          REDIS_HOST: "{{ redis_host }}"
+
+    - name: Pull Result image
+      community.docker.docker_image:
+        name: vitotolantoto/result
+        tag: latest
+        source: pull
+
+    - name: Run Result container
+      community.docker.docker_container:
+        name: result
+        image: vitotolantoto/result:latest
+        state: started
+        restart_policy: always
+        ports:
+          - "80:80"
+        env:
+          DATABASE_HOST: "{{ db_host }}"
+          DATABASE_USER: "{{ db_user }}"
+          DATABASE_PASSWORD: "{{ db_password }}"
+          DATABASE_NAME: "{{ db_name }}"

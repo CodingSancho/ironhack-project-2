@@ -1,0 +1,11 @@
+---
+# Master playbook — runs everything in the correct order:
+# 1. Docker on all instances
+# 2. PostgreSQL (must be up before Worker connects)
+# 3. Redis + Worker (Worker needs Postgres running)
+# 4. Vote + Result (need Redis and Postgres reachable)
+
+- import_playbook: install_docker.yml
+- import_playbook: deploy_db.yml
+- import_playbook: deploy_backend.yml
+- import_playbook: deploy_frontend.yml

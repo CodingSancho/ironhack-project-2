@@ -4,3 +4,21 @@ bin/
 obj/
 .vs/
 node_modules/
+
+# Terraform
+.terraform/
+terraform/**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform.lock.hcl
+
+# Ansible
+ansible/group_vars/all/vault.yml
+
+# SSH keys
+*.pem
+*.key
+ansible/ssh_config
+ansible/outputs.tf
+ansible/variables.tf

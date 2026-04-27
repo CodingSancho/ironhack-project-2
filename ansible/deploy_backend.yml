@@ -1,0 +1,45 @@
+---
+- name: Deploy Redis and Worker on Instance B
+  hosts: backend
+  become: true
+
+  vars:
+    db_host: "10.0.3.18"
+    db_user: "postgres"
+    db_password: "postgres"
+    db_name: "postgres"
+
+  tasks:
+    - name: Pull Redis image
+      community.docker.docker_image:
+        name: redis
+        tag: alpine
+        source: pull
+
+    - name: Run Redis container
+      community.docker.docker_container:
+        name: redis
+        image: redis:alpine
+        state: started
+        restart_policy: always
+        ports:
+          - "6379:6379"
+
+    - name: Pull Worker image
+      community.docker.docker_image:
+        name: vitotolantoto/worker
+        tag: latest
+        source: pull
+
+    - name: Run Worker container
+      community.docker.docker_container:
+        name: worker
+        image: vitotolantoto/worker:latest
+        state: started
+        restart_policy: always
+        env:
+          REDIS_HOST: "127.0.0.1"       # Redis is on the same instance
+          DATABASE_HOST: "{{ db_host }}"
+          DATABASE_USER: "{{ db_user }}"
+          DATABASE_PASSWORD: "{{ db_password }}"
+          DATABASE_NAME: "{{ db_name }}"
