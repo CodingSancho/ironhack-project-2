@@ -1,0 +1,68 @@
+---
+- name: Install and configure CloudWatch Agent
+  hosts: all
+  become: true
+
+  vars:
+    cw_config: |
+      {
+        "logs": {
+          "logs_collected": {
+            "files": {
+              "collect_list": [
+                {
+                  "file_path": "/var/lib/docker/containers/**/*-json.log",
+                  "log_group_name": "/voting-app-viktor/docker",
+                  "log_stream_name": "{instance_id}-{hostname}",
+                  "timezone": "UTC",
+                  "multi_line_start_pattern": "^{"
+                }
+              ]
+            }
+          }
+        },
+        "metrics": {
+          "namespace": "VotingApp/Viktor",
+          "metrics_collected": {
+            "cpu": {
+              "measurement": ["cpu_usage_idle", "cpu_usage_user", "cpu_usage_system"],
+              "metrics_collection_interval": 60
+            },
+            "mem": {
+              "measurement": ["mem_used_percent"],
+              "metrics_collection_interval": 60
+            },
+            "disk": {
+              "measurement": ["disk_used_percent"],
+              "metrics_collection_interval": 60,
+              "resources": ["/"]
+            }
+          }
+        }
+      }
+
+  tasks:
+    - name: Download CloudWatch Agent package
+      ansible.builtin.get_url:
+        url: https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+        dest: /tmp/amazon-cloudwatch-agent.deb
+
+    - name: Install CloudWatch Agent
+      ansible.builtin.apt:
+        deb: /tmp/amazon-cloudwatch-agent.deb
+        state: present
+
+    - name: Write CloudWatch Agent config
+      ansible.builtin.copy:
+        content: "{{ cw_config }}"
+        dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+        mode: '0644'
+
+    - name: Start CloudWatch Agent
+      ansible.builtin.command: >
+        /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
+        -a fetch-config
+        -m ec2
+        -s
+        -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+      changed_when: true

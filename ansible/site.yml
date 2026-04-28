@@ -6,6 +6,7 @@
 # 4. Vote + Result (need Redis and Postgres reachable)
 
 - import_playbook: install_docker.yml
+- import_playbook: setup_cloudwatch.yml
 - import_playbook: deploy_db.yml
 - import_playbook: deploy_backend.yml
 - import_playbook: deploy_frontend.yml
