@@ -24,21 +24,21 @@ jobs:
         with:
           context: ./vote
           push: true
-          tags: codingsancho/vote:latest
+          tags: vitotolantoto/vote:latest
 
       - name: Build and push result
         uses: docker/build-push-action@v4
         with:
           context: ./result
           push: true
-          tags: codingsancho/result:latest
+          tags: vitotolantoto/result:latest
 
       - name: Build and push worker
         uses: docker/build-push-action@v4
         with:
           context: ./worker
           push: true
-          tags: codingsancho/worker:latest
+          tags: vitotolantoto/worker:latest
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

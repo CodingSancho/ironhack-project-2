@@ -14,4 +14,7 @@ spec:
     spec:
       containers:
         - name: worker
-          image: codingsancho/worker:latest
+          image: vitotolantoto/worker:latest
+          env:
+            - name: DB_NAME
+              value: "votes"

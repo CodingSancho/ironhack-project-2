@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: result
-          image: codingsancho/result:latest
+          image: vitotolantoto/result:latest
           ports:
             - containerPort: 80
